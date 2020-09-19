@@ -5,7 +5,7 @@ const videoGrid=document.getElementById('video-grid')
 
 const myPeer=new Peer(undefined,{
     host:'/',
-    port:'3002'
+    port:'3001'
 })
 
 const myVideo=document.createElement('video')
@@ -18,11 +18,19 @@ navigator.mediaDevices.getUserMedia({
 }).then(stream=>{
     addVideoStream(myVideo,stream)
 
+
+    myPeer.on('call',call=>{
+        call.answer(stream)
+    const video=document.createElement('video')
+        call.on('stream',UserVideoStream=>{
+            addVideoStream(video,UserVideoStream)
+        })
+    })
+
     socket.on('user-connected',userid=>{
 
         connectToNewUser(userid,stream)
-    }
-    )
+    })
 })
 
 socket.on('user-disconnected',userid=>{
@@ -34,14 +42,8 @@ myPeer.on('open',id=>{
     socket.emit('join-room',ROOM_ID,id)
 })
 
-myPeer.on('call',call=>{
-    call.answer(stream)
-const video=document.createElement('video')
-    call.on('stream',UserVideoStream=>{
-        addVideoStream(video,UserVideoStream)
-    })
-})
-socket.emit('join-room',ROOM_ID,10)
+
+// socket.emit('join-room',ROOM_ID,id)
 
 // socket.on('user-connected',userid=>{
 
